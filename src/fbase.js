@@ -1,7 +1,9 @@
 import * as firebase from "firebase/app";
+import "firebase/auth";
 
 // Your web app's Firebase configuration
 
+// 리액트에서는 환경변수를 정의할 때 REACT_APP_ 을 반드시 앞에 써줘야한다.
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_API_KEY,
   authDomain: process.env.REACT_APP_AUTH_DOMAIN,
@@ -13,4 +15,6 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-export default firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(firebaseConfig);
+
+export const authService = firebase.auth();
