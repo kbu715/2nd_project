@@ -41,6 +41,6 @@ const Auth = () => {
         <button>Continue with Github</button>
       </div>
     </div>
-  );
+  )
 };
 export default Auth;
