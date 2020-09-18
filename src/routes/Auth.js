@@ -15,6 +15,16 @@ const Auth = () => {
           setPassword(value);
       }
   };
+
+//   persistence type
+
+// 'local' : 브라우저를 닫더라도 사용자 정보는 기억될 것이다. 
+
+// 'session' : 브라우저가 열려있는 동안에는 사용자 정보를 기억하는 것을 의미
+
+// 'none' : 유저를 기억하지 않는다.
+
+
   const onSubmit = async (event) => {
     event.preventDefault();
     let data;
