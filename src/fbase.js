@@ -1,6 +1,6 @@
 import * as firebase from "firebase/app";
 import "firebase/auth";
-
+import "firebase/firestore" //firebase 데이터 베이스 사용 준비
 // Your web app's Firebase configuration
 
 // 리액트에서는 환경변수를 정의할 때 REACT_APP_ 을 반드시 앞에 써줘야한다.
@@ -20,3 +20,4 @@ firebase.initializeApp(firebaseConfig);
 export const firebaseInstance = firebase;
 
 export const authService = firebase.auth();
+export const dbService = firebase.firestore();
