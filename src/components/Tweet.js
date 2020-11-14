@@ -1,14 +1,16 @@
-import { dbService } from "fbase";
+import { dbService, storageService } from "fbase";
 import React, { useState } from "react";
 
 const Tweet = ({ tweetObj, isOwner }) => {
-  const [editing, setEditing] = useState(false);
-  const [newTweet, setNewTweet] = useState(tweetObj.text);
+  const [editing, setEditing] = useState(false); //tweet을 수정하고 있는지 아닌지를 뜻한다.
+  const [newTweet, setNewTweet] = useState(tweetObj.text); //input의 값을 수정 할 수 있다.
+
   const onDeleteClick = async () => {
-    const ok = window.confirm("Are you sure you want to delete this?");
+    const ok = window.confirm("이 tweet을 삭제하시겠습니까?");
     if (ok) {
       //delete tweet
       await dbService.doc(`datas/${tweetObj.id}`).delete();
+      await storageService.refFromURL(tweetObj.attachmentUrl).delete();
     } else {
     }
   };
@@ -53,6 +55,7 @@ const Tweet = ({ tweetObj, isOwner }) => {
       ) : (
         <>
           <h4>{tweetObj.text}</h4>
+          {tweetObj.attachmentUrl && <img src={tweetObj.attachmentUrl} width="50px" height="50px" alt="img" />}
           {isOwner && (
             <>
               <button onClick={onDeleteClick}>Delete Tweet</button>

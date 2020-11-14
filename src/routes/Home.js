@@ -7,6 +7,7 @@ const Home = ({ userObj }) => {
   const [tweet, setTweet] = useState("");
   const [tweets, setTweets] = useState([]);
   const [attachment, setAttachment] = useState();
+
   //< 이 방법은 구식이다 >
 
   // const getTweets = async () => {
@@ -23,10 +24,10 @@ const Home = ({ userObj }) => {
   useEffect(() => {
     // getTweets();
 
-    //이 방식이 forEach 방법보다 덜 re-render 하게 한다.
+    //이 방식이 forEach 방법보다 덜 re-render 하게 함으로써 더빠르게 실행되도록 한다.
     //onsnapshot 은 기본적으로 데이터베이스에 무슨일이 있을 때, 알림을 받는다.
-    dbService.collection("datas").onSnapshot(snapshot => {
-      const tweetArray = snapshot.docs.map(doc => ({
+    dbService.collection("datas").onSnapshot((snapshot) => {
+      const tweetArray = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
@@ -34,46 +35,56 @@ const Home = ({ userObj }) => {
     });
   }, []);
 
-  const onSubmit = async event => {
+  const onSubmit = async (event) => {
     event.preventDefault();
-    //child()는 collection() 이랑 비슷
-    //npm install uuid : uuid는 기본적으로 어떤 특별한 식별자를 랜덤으로 제공
+    let attachmentUrl = "";
+    if (attachment !== "") { //첨부파일이 있는경우!!!
+      //child()는 collection() 이랑 비슷
+      //npm install uuid : uuid는 기본적으로 어떤 특별한 식별자를 랜덤으로 제공
 
-    // 1. 먼저 파일에 대한 레퍼런스를 만든다.
-    const fileRef = storageService.ref().child(`${userObj.uid}/${uuidv4()}`);
-    //2. 그런다음 파일 데이터를 레퍼런스로 보낸다. putstring 사용 : putString(url, type)
-    const response = await fileRef.putString(attachment, "data_url");
-    console.log(response);
+      // 1. 먼저 파일에 대한 레퍼런스를 만든다.
+      const attachmentRef = storageService
+        .ref()
+        .child(`${userObj.uid}/${uuidv4()}`);
+      //2. 그런다음 파일 데이터를 레퍼런스로 보낸다. putstring 사용 : putString(url, type)
+      const response = await attachmentRef.putString(attachment, "data_url");
 
-    // await dbService.collection("datas").add({
-    //   text: tweet,
-    //   createdAt: Date.now(),
-    //   creatorId: userObj.uid, //uid: user id
-    // });
-    // setTweet("");
+      attachmentUrl = await response.ref.getDownloadURL();
+    }
+
+    const tweetObj = {
+      text: tweet,
+      createdAt: Date.now(),
+      creatorId: userObj.uid, //uid: user id
+      attachmentUrl,
+    };
+    await dbService.collection("datas").add(tweetObj);
+    setTweet("");
+    setAttachment("");
   };
-  const onChange = event => {
+  const onChange = (event) => {
     const {
       target: { value },
     } = event;
     setTweet(value);
   };
 
-  const onFileChange = event => {
+  const onFileChange = (event) => {
     const {
       target: { files },
     } = event;
     const theFile = files[0];
     //FileReader api를 사용해 file 이름을 읽는다.
-    const reader = new FileReader();
-    reader.onloadend = finishedEvent => {
+    const reader = new FileReader(); //FileReader mdn 참고
+    reader.onloadend = (finishedEvent) => {
+      //Event Listener이다. 파일로딩이 끝나면 finishedEvent를 갖게 된다.
       // console.log(finishedEvent);
       const {
         currentTarget: { result },
       } = finishedEvent;
       setAttachment(result);
     };
-    reader.readAsDataURL(theFile);
+    reader.readAsDataURL(theFile); // 그다음에 readAsDataURL 을 실행한다.
   };
 
   const onClearAttachment = () => {
@@ -99,7 +110,7 @@ const Home = ({ userObj }) => {
         )}
       </form>
       <div>
-        {tweets.map(tweet => (
+        {tweets.map((tweet) => (
           <Tweet
             key={tweet.id}
             tweetObj={tweet}
