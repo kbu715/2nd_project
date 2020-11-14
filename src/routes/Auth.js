@@ -16,7 +16,7 @@ const Auth = () => {
       }
   };
 
-//   persistence type
+//   types of Auth state persistence
 
 // 'local' : 브라우저를 닫더라도 사용자 정보는 기억될 것이다. 
 
@@ -31,7 +31,8 @@ const Auth = () => {
     try {
       if(newAccount) {
         //create account
-        data = await authService.createUserWithEmailAndPassword(
+        data = await authService.createUserWithEmailAndPassword( 
+          //On successful creation of the user account, this user will also be signed in to your application. 자동 로그인이 될것이다!
           email,
           password
         )

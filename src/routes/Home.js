@@ -11,7 +11,7 @@ const Home = () => {
         ...document.data(),
         id: document.id,
       };
-      setTweets((prev) => [tweetObject, ...prev]);
+      setTweets((prev) => [tweetObject, ...prev]); //set함수 쓸 때 함수를 전달하면, 리액트는 이전 값에 접근할 수 있게 해준다.
     });
   };
 
@@ -41,13 +41,14 @@ const Home = () => {
           onChange={onChange}
           type="text"
           plsaceholder="What's on your mind?"
+          maxLength={120}
         />
         <input type="submit" placeholder="submit" />
       </form>
       <div>
         {tweets.map((tweet) => (
           <div key={tweet.id}>
-            <h4>{tweet.data}</h4>
+            <h4>{tweet.tweet}</h4>
           </div>
         ))}
       </div>

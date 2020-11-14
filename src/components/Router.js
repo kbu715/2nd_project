@@ -9,7 +9,8 @@ const AppRouter = ({ isLoggedIn }) => {
   return (
     <Router>
       {isLoggedIn && <Navigation />}
-      <Switch>
+      <Switch> 
+        {/* Switch는 한번에 하나의 Route만 볼수 있게 해준다 */}
         {isLoggedIn ? (
           <>
             <Route exact path="/">
