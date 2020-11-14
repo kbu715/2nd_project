@@ -10,21 +10,28 @@ function App() {
   // 그래서 이렇게
   const [init, setInit] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  useEffect(()=>{
-    authService.onAuthStateChanged((user)=>{ //사용자의 로그인 상태의 변화를 관찰하는 관찰자를 추가시킨다
+  const [userObj, setUserObj] = useState(null);
+  useEffect(() => {
+    authService.onAuthStateChanged(user => {
+      // onAuthStateChanged : //사용자의 로그인 상태의 변화를 관찰하는 관찰자를 추가시킨다
       //유저 상태의 변화가 있을 때 알아차린다. 무슨 뜻이냐, 유저가 로그아웃 할 때, 로그인할때, 계정을 생성할 때도, firebase가 초기화될 때도 발생
-      if(user) {
+      if (user) {
         setIsLoggedIn(true);
+        setUserObj(user);
       } else {
         setIsLoggedIn(false);
       }
       setInit(true);
-    })
-  }, [])
-  
+    });
+  }, []);
+
   return (
     <>
-    {init ? <AppRouter isLoggedIn={isLoggedIn} /> : 'Initializing....'}
+      {init ? (
+        <AppRouter isLoggedIn={isLoggedIn} userObj={userObj} />
+      ) : (
+        "Initializing...."
+      )}
       <footer>&copy;  {new Date().getFullYear()} Twitter</footer>
     </>
   );
