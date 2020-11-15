@@ -1,12 +1,10 @@
 import Tweet from "components/Tweet";
-import { dbService, storageService } from "fbase";
+import { dbService } from "fbase";
 import React, { useEffect, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
+import TweetFactory from "components/TweetFactory";
 
 const Home = ({ userObj }) => {
-  const [tweet, setTweet] = useState("");
   const [tweets, setTweets] = useState([]);
-  const [attachment, setAttachment] = useState("");
 
   //< 이 방법은 구식이다 >
 
@@ -21,94 +19,27 @@ const Home = ({ userObj }) => {
   //   });
   // };
 
-  useEffect(() => {
-    // getTweets();
-
+  const getTweets = () => {
     //이 방식이 forEach 방법보다 덜 re-render 하게 함으로써 더빠르게 실행되도록 한다.
     //onsnapshot 은 기본적으로 데이터베이스에 무슨일이 있을 때, 알림을 받는다.
-    dbService.collection("datas").onSnapshot((snapshot) => {
+    dbService.collection("datas").orderBy("createdAt", "desc").onSnapshot(  (snapshot) => {
       const tweetArray = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
       setTweets(tweetArray);
+
     });
+  }
+
+  useEffect(() => {
+    getTweets();
   }, []);
 
-  const onSubmit = async (event) => {
-    event.preventDefault();
-    let attachmentUrl = "";
-    if (attachment !== "") { //첨부파일이 있는경우!!!
-      //child()는 collection() 이랑 비슷
-      //npm install uuid : uuid는 기본적으로 어떤 특별한 식별자를 랜덤으로 제공
 
-      // 1. 먼저 파일에 대한 레퍼런스를 만든다.
-      const attachmentRef = storageService
-        .ref()
-        .child(`${userObj.uid}/${uuidv4()}`);
-      //2. 그런다음 파일 데이터를 레퍼런스로 보낸다. putstring 사용 : putString(url, type)
-      const response = await attachmentRef.putString(attachment, "data_url");
-
-      attachmentUrl = await response.ref.getDownloadURL();
-    }
-
-    const tweetObj = {
-      text: tweet,
-      createdAt: Date.now(),
-      creatorId: userObj.uid, //uid: user id
-      attachmentUrl,
-    };
-    await dbService.collection("datas").add(tweetObj);
-    setTweet("");
-    setAttachment("");
-  };
-  const onChange = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setTweet(value);
-  };
-
-  const onFileChange = (event) => {
-    const {
-      target: { files },
-    } = event;
-    const theFile = files[0];
-    //FileReader api를 사용해 file 이름을 읽는다.
-    const reader = new FileReader(); //FileReader mdn 참고
-    reader.onloadend = (finishedEvent) => {
-      //Event Listener이다. 파일로딩이 끝나면 finishedEvent를 갖게 된다.
-      // console.log(finishedEvent);
-      const {
-        currentTarget: { result },
-      } = finishedEvent;
-      setAttachment(result);
-    };
-    reader.readAsDataURL(theFile); // 그다음에 readAsDataURL 을 실행한다.
-  };
-
-  const onClearAttachment = () => {
-    setAttachment(null);
-  };
   return (
     <div>
-      <form onSubmit={onSubmit}>
-        <input
-          value={tweet}
-          onChange={onChange}
-          type="text"
-          plsaceholder="What's on your mind?"
-          maxLength={120}
-        />
-        <input type="file" accept="image/*" onChange={onFileChange} />
-        <input type="submit" value="tweet" />
-        {attachment && (
-          <div>
-            <img src={attachment} alt="img" width="50px" height="50px" />
-            <button onClick={onClearAttachment}>Clear</button>
-          </div>
-        )}
-      </form>
+      <TweetFactory userObj={userObj} />
       <div>
         {tweets.map((tweet) => (
           <Tweet

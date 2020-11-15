@@ -10,7 +10,9 @@ const Tweet = ({ tweetObj, isOwner }) => {
     if (ok) {
       //delete tweet
       await dbService.doc(`datas/${tweetObj.id}`).delete();
-      await storageService.refFromURL(tweetObj.attachmentUrl).delete();
+      if(tweetObj.attachmentUrl !== ""){
+        await storageService.refFromURL(tweetObj.attachmentUrl).delete();
+      }
     } else {
     }
   };
