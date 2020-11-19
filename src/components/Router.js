@@ -9,10 +9,20 @@ const AppRouter = ({ refreshUser, isLoggedIn, userObj }) => {
   return (
     <Router>
       {isLoggedIn && <Navigation userObj={userObj} />}
-      <Switch> 
+      <Switch>
+        <React.Fragment>
         {/* Switch는 한번에 하나의 Route만 볼수 있게 해준다 */}
         {isLoggedIn ? (
-          <>
+          <div
+            style={{
+              maxWidth: 890,
+              width: "100%",
+              margin: "0 auto",
+              marginTop: 80,
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
             <Route exact path="/">
               <Home userObj={userObj} />
             </Route>
@@ -21,15 +31,16 @@ const AppRouter = ({ refreshUser, isLoggedIn, userObj }) => {
             </Route>
             {/* <Redirect from='*' to='/' />  */}
             {/* 어떤 주소든 '/'로 이동 */}
-          </>
+          </div>
         ) : (
           <>
-          <Route exact path="/"> 
-            <Auth />
-          </Route>
-          {/* <Redirect from='*' to='/' /> */}
+            <Route exact path="/">
+              <Auth />
+            </Route>
+            {/* <Redirect from='*' to='/' /> */}
           </>
         )}
+        </React.Fragment>
       </Switch>
     </Router>
   );
